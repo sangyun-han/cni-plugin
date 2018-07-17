@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/containernetworking/cni/pkg/types/current"
 	"github.com/containernetworking/cni/pkg/version"
+	"os/exec"
+	"os"
 )
 
 type CNIConf struct {
@@ -29,6 +31,9 @@ func parseConfig(stdin []byte) (*CNIConf, error) {
 	return &conf, nil
 }
 
+// ovs-vsctl add-br br0
+// ifconfig br0 10.0.1.1 netmask 255.255.255.0 up
+// ovs-docker add-port BRIDGE_NAME ETH CONTAINER_NAME --ipaddress=<ip/subnet>
 func cmdAdd(args *skel.CmdArgs) error {
 	conf, err := parseConfig(args.StdinData)
 
@@ -36,6 +41,13 @@ func cmdAdd(args *skel.CmdArgs) error {
 		return err
 	}
 
+	// make command script to add container
+	script := "./ovs-docker" + ""
+
+	cmd := exec.Command(script)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 	//TODO : implement
 
 	return types.PrintResult(conf.PrevResult, conf.CNIVersion)
