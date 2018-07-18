@@ -8,7 +8,15 @@ import (
 	"github.com/containernetworking/cni/pkg/types/current"
 	"github.com/containernetworking/cni/pkg/version"
 	"os/exec"
+	"bytes"
 	"os"
+)
+
+const OVS_CMD_PATH = "/usr/bin"
+const OVS_DOCKER_CMD = "ovs-docker"
+const (
+	ADD_PORT = "add-port"
+	DEL_PORT = "del-port"
 )
 
 type CNIConf struct {
@@ -41,14 +49,17 @@ func cmdAdd(args *skel.CmdArgs) error {
 		return err
 	}
 
-	// make command script to add container
-	script := "./ovs-docker" + ""
+	brName := "br0"
 
-	cmd := exec.Command(script)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Run()
-	//TODO : implement
+	// make command script to add container
+	cmd := exec.Command(OVS_DOCKER_CMD, ADD_PORT, brName, args.IfName, args.ContainerID)
+	cmdOutput := &bytes.Buffer{}
+	cmd.Stdout = cmdOutput
+	err = cmd.Run()
+	if err != nil {
+		os.Stderr.WriteString(err.Error())
+	}
+	fmt.Println(string(cmdOutput.Bytes()))
 
 	return types.PrintResult(conf.PrevResult, conf.CNIVersion)
 }
