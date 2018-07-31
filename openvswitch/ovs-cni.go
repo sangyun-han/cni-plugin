@@ -1,4 +1,4 @@
-package cni_plugin
+package openvswitch
 
 import (
 	"github.com/containernetworking/cni/pkg/skel"
@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"bytes"
 	"os"
+	"net"
+	"github.com/john-lin/ovsdb"
 )
 
 const OVS_CMD_PATH = "/usr/bin"
@@ -18,6 +20,16 @@ const (
 	ADD_PORT = "add-port"
 	DEL_PORT = "del-port"
 )
+
+type OVS struct {
+	BridgeName string
+	MACAddr    string
+	CtrlAddr   net.IP
+	CtrlPort   int
+	OVSDB      *ovsdb.OvsDriver
+}
+
+
 
 type CNIConf struct {
 	//libcni.RuntimeConf
