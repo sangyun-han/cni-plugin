@@ -12,6 +12,8 @@ import (
 	"os"
 	"net"
 	"github.com/john-lin/ovsdb"
+	"time"
+	"github.com/vishvananda/netlink"
 )
 
 const OVS_CMD_PATH = "/usr/bin"
@@ -21,16 +23,6 @@ const (
 	DEL_PORT = "del-port"
 )
 
-type OVS struct {
-	BridgeName string
-	MACAddr    string
-	CtrlAddr   net.IP
-	CtrlPort   int
-	OVSDB      *ovsdb.OvsDriver
-}
-
-
-
 type CNIConf struct {
 	//libcni.RuntimeConf
 	types.NetConf
@@ -39,6 +31,65 @@ type CNIConf struct {
 	} `json:"runtimeConfig"`
 
 	PrevResult *current.Result `json:"-"`
+}
+
+type OpenVSwitch struct {
+	BridgeName string
+	MACAddr    string
+	CtrlAddr   net.IP
+	CtrlPort   int
+	OVSDB      *ovsdb.OvsDriver
+}
+
+func NewOpenVSwitch(bridgeName string) (*OpenVSwitch, error) {
+	sw := new(OpenVSwitch)
+	sw.BridgeName = bridgeName
+	sw.OVSDB = ovsdb.NewOvsDriverWithUnix(bridgeName)
+
+	if !sw.OVSDB.IsBridgePresent(bridgeName) {
+		err := sw.OVSDB.CreateBridge(bridgeName, "standalone", true)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	time.Sleep(300 * time.Millisecond)
+
+	err := setLinkUp(bridgeName)
+	if err != nil {
+		return nil, err
+	}
+
+	return sw, nil
+}
+
+// VLAN will be added
+func (sw *OpenVSwitch) addPort(ifName string) error {
+	if !sw.OVSDB.IsPortNamePresent(ifName) {
+		err := sw.OVSDB.CreatePort(ifName, "", 0)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (sw *OpenVSwitch) delPort(ifName string) error {
+	if sw.OVSDB.IsPortNamePresent(ifName) {
+		err := sw.OVSDB.DeletePort(ifName)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func setLinkUp(ifName string) error {
+	iface, err := netlink.LinkByName(ifName)
+	if err != nil {
+		return err
+	}
+	return netlink.LinkSetUp(iface)
 }
 
 func parseConfig(stdin []byte) (*CNIConf, error) {
