@@ -3,9 +3,7 @@ package openvswitch
 import (
 	"github.com/containernetworking/cni/pkg/skel"
 	"github.com/containernetworking/cni/pkg/types"
-	"encoding/json"
 	"fmt"
-	"github.com/containernetworking/cni/pkg/types/current"
 	"github.com/containernetworking/cni/pkg/version"
 	"os/exec"
 	"bytes"
@@ -14,24 +12,16 @@ import (
 	"github.com/john-lin/ovsdb"
 	"time"
 	"github.com/vishvananda/netlink"
+	"github.com/sangyun-han/cni-plugin/utils"
 )
 
-const OVS_CMD_PATH = "/usr/bin"
 const OVS_DOCKER_CMD = "ovs-docker"
 const (
 	ADD_PORT = "add-port"
 	DEL_PORT = "del-port"
 )
 
-type CNIConf struct {
-	//libcni.RuntimeConf
-	types.NetConf
-	RuntimeConfig *struct {
-		SampleConfig map[string]interface{} `json:"sample"`
-	} `json:"runtimeConfig"`
 
-	PrevResult *current.Result `json:"-"`
-}
 
 type OpenVSwitch struct {
 	BridgeName string
@@ -92,21 +82,13 @@ func setLinkUp(ifName string) error {
 	return netlink.LinkSetUp(iface)
 }
 
-func parseConfig(stdin []byte) (*CNIConf, error) {
-	conf := CNIConf{}
 
-	if err := json.Unmarshal(stdin, &conf); err != nil {
-		return nil, fmt.Errorf("failed to parse network configuration: %v", err)
-	}
-
-	return &conf, nil
-}
 
 // ovs-vsctl add-br br0
 // ifconfig br0 10.0.1.1 netmask 255.255.255.0 up
 // ovs-docker add-port BRIDGE_NAME ETH CONTAINER_NAME --ipaddress=<ip/subnet>
 func cmdAdd(args *skel.CmdArgs) error {
-	conf, err := parseConfig(args.StdinData)
+	conf, err := utils.ParseConfig(args.StdinData)
 
 	if err != nil {
 		return err
@@ -128,7 +110,7 @@ func cmdAdd(args *skel.CmdArgs) error {
 }
 
 func cmdDel(args *skel.CmdArgs) error {
-	conf, err := parseConfig(args.StdinData)
+	conf, err := utils.ParseConfig(args.StdinData)
 	if err != nil {
 		return err
 	}
@@ -143,5 +125,5 @@ func cmdGet(args *skel.CmdArgs) error {
 
 func main() {
 	// init code
-	skel.PluginMain(cmdAdd, cmdGet, cmdDel, version.All, "TODO")
+	skel.PluginMain(cmdAdd, cmdDel, version.All)
 }
