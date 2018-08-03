@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/containernetworking/cni/pkg/types"
 	"github.com/containernetworking/cni/pkg/types/current"
+	"github.com/vishvananda/netlink"
 )
 
 type CNIConf struct {
@@ -25,4 +26,12 @@ func ParseConfig(stdin []byte) (*CNIConf, error) {
 	}
 
 	return &conf, nil
+}
+
+func SetLinkUp(ifName string) error {
+	iface, err := netlink.LinkByName(ifName)
+	if err != nil {
+		return err
+	}
+	return netlink.LinkSetUp(iface)
 }

@@ -11,7 +11,6 @@ import (
 	"net"
 	"github.com/john-lin/ovsdb"
 	"time"
-	"github.com/vishvananda/netlink"
 	"github.com/sangyun-han/cni-plugin/utils"
 )
 
@@ -45,7 +44,7 @@ func NewOpenVSwitch(bridgeName string) (*OpenVSwitch, error) {
 
 	time.Sleep(300 * time.Millisecond)
 
-	err := setLinkUp(bridgeName)
+	err := utils.SetLinkUp(bridgeName)
 	if err != nil {
 		return nil, err
 	}
@@ -74,13 +73,7 @@ func (sw *OpenVSwitch) delPort(ifName string) error {
 	return nil
 }
 
-func setLinkUp(ifName string) error {
-	iface, err := netlink.LinkByName(ifName)
-	if err != nil {
-		return err
-	}
-	return netlink.LinkSetUp(iface)
-}
+
 
 
 
