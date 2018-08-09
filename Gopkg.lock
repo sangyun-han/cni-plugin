@@ -2,25 +2,6 @@
 
 
 [[projects]]
-  digest = "1:5832cb213f5c037f7bcac66a149fcc1b037c770c613e1283387fe249f950cd57"
-  name = "github.com/cenkalti/hub"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "37a52d60b72c40fc74b206506155c677171f2823"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:c3d15fa14e154b9804706d5c92f9b61ec96c5e5d60ebaf491aa2333276a63797"
-  name = "github.com/cenkalti/rpc2"
-  packages = [
-    ".",
-    "jsonrpc",
-  ]
-  pruneopts = "UT"
-  revision = "9642ea02d0aad04b8efb5e1a6bbc63daf8d0903d"
-
-[[projects]]
   digest = "1:fdd07ff1d3b56a4338688dca999e7a09eacab635d450ca9338bfdd81fd817d9e"
   name = "github.com/containernetworking/cni"
   packages = [
@@ -35,6 +16,26 @@
   version = "v0.6.0"
 
 [[projects]]
+  digest = "1:42153543c03b78bab62ef74f1d5fcaa4c196c0c4f47eb9b4e054d788bcbc5144"
+  name = "github.com/containernetworking/plugins"
+  packages = [
+    "pkg/ip",
+    "pkg/ns",
+    "pkg/utils/hwaddr",
+  ]
+  pruneopts = "UT"
+  revision = "19f2f28178aa88772f69c4eeb3793d4a63c244b0"
+  version = "v0.7.3"
+
+[[projects]]
+  digest = "1:536efb6849eb903912acbec0183e1b34e31cc75217b44988aedde59ad249c693"
+  name = "github.com/coreos/go-iptables"
+  packages = ["iptables"]
+  pruneopts = "UT"
+  revision = "47f22b0dd3355c0ba570ba12b0b8a36bf214c04b"
+  version = "v0.4.0"
+
+[[projects]]
   branch = "master"
   digest = "1:66658a2f8ebd708518c46141f80493136be05a58245baaacb286901cd219df90"
   name = "github.com/john-lin/ovsdb"
@@ -43,19 +44,25 @@
   revision = "c84bb513c0524d0e891e45299560b178655c3241"
 
 [[projects]]
-  digest = "1:fb011abd58a582cf867409273f372fc6437eda670ff02055c47e6203e90466d7"
+  digest = "1:d867dfa6751c8d7a435821ad3b736310c2ed68945d05b50fb9d23aee0540c8cc"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "89742aefa4b206dcf400792f3bd35b542998eb3b"
+  revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
+  version = "v1.0.6"
 
 [[projects]]
-  branch = "master"
-  digest = "1:9c17b5792c17ee189a2e7412c54c67a89b22961bae6a710264cc957ece7bb1be"
+  digest = "1:8832120e0a822e4c956df6d4ffd7cb26a845052b53c15637ac08c8a68a95057d"
   name = "github.com/socketplane/libovsdb"
-  packages = ["."]
+  packages = [
+    ".",
+    "Godeps/_workspace/src/github.com/cenkalti/hub",
+    "Godeps/_workspace/src/github.com/cenkalti/rpc2",
+    "Godeps/_workspace/src/github.com/cenkalti/rpc2/jsonrpc",
+  ]
   pruneopts = "UT"
-  revision = "4de3618546deba09d8875d719752db32bd4652c0"
+  revision = "555a561202ec17fe6c068038a35291ce9ba33066"
+  version = "v0.1"
 
 [[projects]]
   digest = "1:2d9d06cb9d46dacfdbb45f8575b39fc0126d083841a29d4fbf8d97708f43107e"
@@ -82,18 +89,18 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
+  revision = "de0752318171da717af4ce24d0a2e8626afaeb11"
 
 [[projects]]
   branch = "master"
-  digest = "1:8742e6e73627b2877c3f723bc1823d5667ec59011242480309dc90fa862512aa"
+  digest = "1:4d16433c0d2c24761b8a507e8c2e9c8cf9193b497d6b38aaeffca038070bc8f5"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "bd9dbc187b6e1dacfdd2722a87e83093c2d7bd6e"
+  revision = "904bdc257025c7b3f43c19360ad3ab85783fad78"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -103,8 +110,10 @@
     "github.com/containernetworking/cni/pkg/types",
     "github.com/containernetworking/cni/pkg/types/current",
     "github.com/containernetworking/cni/pkg/version",
+    "github.com/containernetworking/plugins/pkg/ip",
     "github.com/john-lin/ovsdb",
     "github.com/vishvananda/netlink",
+    "github.com/vishvananda/netns",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -73,10 +73,6 @@ func (sw *OpenVSwitch) delPort(ifName string) error {
 	return nil
 }
 
-
-
-
-
 // ovs-vsctl add-br br0
 // ifconfig br0 10.0.1.1 netmask 255.255.255.0 up
 // ovs-docker add-port BRIDGE_NAME ETH CONTAINER_NAME --ipaddress=<ip/subnet>
@@ -88,6 +84,11 @@ func cmdAdd(args *skel.CmdArgs) error {
 	}
 
 	brName := "br0"
+
+	//ovs, err := NewOpenVSwitch(conf.Name)
+	if err != nil {
+		fmt.Errorf("Error : %v", err)
+	}
 
 	// make command script to add container
 	cmd := exec.Command(OVS_DOCKER_CMD, ADD_PORT, brName, args.IfName, args.ContainerID)

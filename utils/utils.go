@@ -6,6 +6,11 @@ import (
 	"github.com/containernetworking/cni/pkg/types"
 	"github.com/containernetworking/cni/pkg/types/current"
 	"github.com/vishvananda/netlink"
+	"syscall"
+	"github.com/vishvananda/netns"
+	"runtime"
+	"path/filepath"
+	"crypto/rand"
 )
 
 type CNIConf struct {
@@ -34,4 +39,46 @@ func SetLinkUp(ifName string) error {
 		return err
 	}
 	return netlink.LinkSetUp(iface)
+}
+
+func AddLinkIfNotExist(link netlink.Link) error {
+	err := netlink.LinkAdd(link)
+	if err != nil && err == syscall.EEXIST {
+		return nil
+	}
+	return fmt.Errorf("failed to add link: %v", err)
+}
+
+func WithNetNS(ns netns.NsHandle, work func() error) error {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	oldNS, err := netns.Get()
+	if err != nil {
+		defer oldNS.Close()
+		err = netns.Set(ns)
+		if err == nil {
+			defer netns.Set(oldNS)
+			err = work()
+		}
+	}
+
+	return err
+}
+
+func NSPathByPidWithRoot(root string, pid int) string {
+	return filepath.Join(root, fmt.Sprintf("/proc/%d/ns/net", pid))
+}
+
+func NSPathByPid(pid int) string {
+	return NSPathByPidWithRoot("/", pid)
+}
+
+func CreateRandomVethName() (string, error) {
+	entropy := make([]byte, 4)
+	_, err := rand.Reader.Read(entropy)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate random veth name: %v", err)
+	}
+	return fmt.Sprintf("veth%x", entropy), nil
 }
